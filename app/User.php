@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Worker;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -15,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'user_mid_name', 'user_last_name', 'tel_user',
     ];
 
     /**
@@ -26,4 +27,31 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function order()
+    {
+        return $this->hasMany('App\Order', 'user_id');
+    }
+
+    public function exeServices()
+    {
+        return $this->hasManyThrough('App\Order', 'App\ExeService', 'user_id', 'order_id');
+    }
+
+    protected function worker(){
+        return $this->hasOne('App\Worker', 'user_id');
+    }
+
+    public function isWorker(){
+        if (!empty($this->worker)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function images()
+    {
+        return $this->morphMany('App\Image', 'imageable');
+    }
 }
